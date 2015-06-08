@@ -3,6 +3,7 @@ from nytimesarticle import articleAPI
 import csv
 import sys
 import os
+import errno
 import requests
 
 def parse_articles(articles):
@@ -41,8 +42,7 @@ def parse_articles(articles):
         news.append(dic)
     return(news) 
 
-def mkdir_nyt(path):
-    path = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
+def mkdir_p(path):
     try:
         os.makedirs(path)
     except OSError as exc: # Python >2.5
@@ -52,12 +52,12 @@ def mkdir_nyt(path):
 
 if __name__ == "__main__":
     api = articleAPI('599c5ebb1e180f4cd6eb426217a06518:6:72209945')
-    nytd_section = ['Arts']#,'Business','Obituaries','Sports','World']
+    nytd_section = ['Obituaries']#,'Business','Obituaries','Sports','World']
     
     for section in nytd_section:
         save_dirpath = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
-        mkdir_nyt(save_dirpath)
-        num_pages = 1 #max = 101
+        mkdir_p(save_dirpath)
+        num_pages = 101 #max = 101
         for i in range (0,num_pages):
             print "scraping %s section, page %d/%d" % (section, i+1, num_pages)
             articles = api.search(sort='newest', fq = {'source':['The New York Times'], 'document_type':['article'], 'section_name':[section]}, page=i)
@@ -79,8 +79,7 @@ if __name__ == "__main__":
                 try:
                     writer = csv.writer(f)
                     writer.writerow( ('url', 'title', 'body') )
-                    for k in range(10):
-                        writer.writerow( (news[j]['url'], news[j]['headline'], body_text[j]) )
+                    writer.writerow( (news[j]['url'], news[j]['headline'], body_tmp) )
                 finally:
                     f.close()
 
