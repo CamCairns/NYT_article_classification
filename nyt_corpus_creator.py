@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from nytimesarticle import articleAPI
 import csv
 import sys
+import os
 import requests
 
 def parse_articles(articles):
@@ -40,14 +41,24 @@ def parse_articles(articles):
         news.append(dic)
     return(news) 
 
+def mkdir_nyt(path):
+    path = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
 
 if __name__ == "__main__":
     api = articleAPI('599c5ebb1e180f4cd6eb426217a06518:6:72209945')
-    nytd_section = ['Arts','Business','Obituaries','Sports','World']
+    nytd_section = ['Arts']#,'Business','Obituaries','Sports','World']
     
     for section in nytd_section:
-        num_pages = 101
-        for i in range (100,num_pages):
+        save_dirpath = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
+        mkdir_nyt(save_dirpath)
+        num_pages = 1 #max = 101
+        for i in range (0,num_pages):
             print "scraping %s section, page %d/%d" % (section, i+1, num_pages)
             articles = api.search(sort='newest', fq = {'source':['The New York Times'], 'document_type':['article'], 'section_name':[section]}, page=i)
             news = parse_articles(articles)
@@ -57,29 +68,21 @@ if __name__ == "__main__":
                 r  = requests.get(news[j]['url'])
                 data = r.text
                 soup = BeautifulSoup(data)
-                a_text = soup.find_all("p", {"class":"story-body-text story-content"})
-#                 b_text = soup.find_all("p", {"itemprop":"articleBody"})
-#                 c_text = soup.find_all("meta", {"name":"lp"}) 
+                g_text = soup.find_all("p", {"class":["story-body-text story-content","story-body-text"]})
+                g_text.extend(soup.find_all(["p", {"itemprop":"articleBody"}]))
                 body_tmp = []
                 for item in g_text:
                     body_tmp.append(item.text)
-                body_text.append(body_tmp) # create a list of lists
-            
-            save_dirpath = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
-            try:
-                os.makedirs(save_filepath)
-            except OSError as exc: # Python >2.5
-                if exc.errno == errno.EEXIST and os.path.isdir(path):
-                    pass
-                else: raise
-            save_filepath = save_dirpath + section + '_' + str(i) + '.csv'
-            f = open(save_filepath, 'w')
-            try:
-                writer = csv.writer(f)
-                writer.writerow( ('url', 'title', 'body') )
-                for k in range(10):
-                    writer.writerow( (news[k]['url'], news[k]['headline'], body_text[k]) )
-            finally:
-                f.close()
+
+                save_filepath = save_dirpath + section + '_' + str(i*10+j).zfill(4) + '.csv'
+                f = open(save_filepath, 'w')
+                try:
+                    writer = csv.writer(f)
+                    writer.writerow( ('url', 'title', 'body') )
+                    for k in range(10):
+                        writer.writerow( (news[j]['url'], news[j]['headline'], body_text[j]) )
+                finally:
+                    f.close()
+
 
 
