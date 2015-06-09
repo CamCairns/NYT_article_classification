@@ -54,12 +54,12 @@ def mkdir_p(path):
 
 if __name__ == "__main__":
     api = articleAPI('599c5ebb1e180f4cd6eb426217a06518:6:72209945')
-    nytd_section = ['Arts','Obituaries']#,'Business','Obituaries','Sports','World']
+    nytd_section = ['Arts']#'Arts','Business','Obituaries','Sports','World']
     
     for section in nytd_section:
         save_dirpath = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
         mkdir_p(save_dirpath)
-        num_pages = 1 #max = 101
+        num_pages = 101 #max = 101
         for i in range (0,num_pages):
             print "scraping %s section, page %d/%d" % (section, i+1, num_pages)
             articles = api.search(sort='newest', fq = {'source':['The New York Times'], 'document_type':['article'], 'section_name':[section]}, page=i)
@@ -84,12 +84,15 @@ if __name__ == "__main__":
                     writer.writerow( (news[j]['url'], news[j]['headline'], body_tmp) )
                 finally:
                     f.close()
-#                 save_filepath = save_dirpath + section + '_' + str(i*10+j).zfill(4) + '.txt'
-#                 textfile = open(save_filepath, 'w')
-#                 try:
-#                     textfile.write( news[j]['headline'] + ' ' + body_tmp[0])
-#                 finally:
-#                     f.close()
+                save_filepath = save_dirpath + section + '_' + str(i*10+j).zfill(4) + '.txt'
+                text = [news[j]['headline']] + body_tmp[:-2] # Leave off an advertising string for another article
+                f=open(save_filepath,'w') 
+                try:
+                    for item in text:
+#                         f.write(item+'\n')
+                        f.write(item)
+                finally:
+                    f.close()
 
 
 
