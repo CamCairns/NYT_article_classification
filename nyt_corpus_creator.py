@@ -54,7 +54,7 @@ def mkdir_p(path):
 
 if __name__ == "__main__":
     api = articleAPI('599c5ebb1e180f4cd6eb426217a06518:6:72209945')
-    nytd_section = ['World']#['Arts','Business','Obituaries','Sports','World']
+    nytd_section = ['Arts','Business','Obituaries','Sports','World']
     
     for section in nytd_section:
         save_dirpath = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
