@@ -7,7 +7,7 @@ from data_science_scripts import results_evaluation
 
 def load_data():
     categories = ['Arts','Business','Obituaries','World','Sports']
-    nyt = load_files("/Users/camcairns/Dropbox/Datasets/nyt_sections/txt_document/", shuffle=True)
+    nyt = load_files("/Users/camcairns/Dropbox/Datasets/nyt_corpus/txt_document/", shuffle=True)
     return nyt
 
 def train_data(nyt, clf):
