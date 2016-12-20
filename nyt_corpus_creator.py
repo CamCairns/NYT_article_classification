@@ -5,8 +5,9 @@ import sys
 import os
 import errno
 import requests
-reload(sys)  
+reload(sys)
 sys.setdefaultencoding('utf8')
+
 
 def parse_articles(articles):
     '''
@@ -21,7 +22,7 @@ def parse_articles(articles):
             dic['abstract'] = i['abstract'].encode("utf8")
         dic['headline'] = i['headline']['main'].encode("utf8")
         dic['desk'] = i['news_desk']
-        dic['date'] = i['pub_date'][0:10] # cutting time of day.
+        dic['date'] = i['pub_date'][0:10]  # cutting time of day.
         dic['section'] = i['section_name']
         if i['snippet'] is not None:
             dic['snippet'] = i['snippet'].encode("utf8")
@@ -31,68 +32,69 @@ def parse_articles(articles):
         dic['word_count'] = i['word_count']
         # locations
         locations = []
-        for x in range(0,len(i['keywords'])):
+        for x in range(0, len(i['keywords'])):
             if 'glocations' in i['keywords'][x]['name']:
                 locations.append(i['keywords'][x]['value'])
         dic['locations'] = locations
         # subject
         subjects = []
-        for x in range(0,len(i['keywords'])):
+        for x in range(0, len(i['keywords'])):
             if 'subject' in i['keywords'][x]['name']:
                 subjects.append(i['keywords'][x]['value'])
-        dic['subjects'] = subjects   
+        dic['subjects'] = subjects
         news.append(dic)
-    return(news) 
+    return(news)
+
 
 def mkdir_p(path):
     try:
         os.makedirs(path)
-    except OSError as exc: # Python >2.5
+    except OSError as exc:  # Python >2.5
         if exc.errno == errno.EEXIST and os.path.isdir(path):
             pass
-        else: raise
+        else:
+            raise
 
 if __name__ == "__main__":
     api = articleAPI('599c5ebb1e180f4cd6eb426217a06518:6:72209945')
-    nytd_section = ['Arts','Business','Obituaries','Sports','World']
-    
+    nytd_section = ['Arts', 'Business', 'Obituaries', 'Sports', 'World']
+
     for section in nytd_section:
         save_dirpath = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
         mkdir_p(save_dirpath)
-        num_pages = 101 #max = 101
-        for i in range (0,num_pages):
-            print "scraping %s section, page %d/%d" % (section, i+1, num_pages)
-            articles = api.search(sort='newest', fq = {'source':['The New York Times'], 'document_type':['article'], 'section_name':[section]}, page=i)
+        num_pages = 101  # max = 101
+        for i in range(0, num_pages):
+            print "scraping %s section, page {0}/{1}".format(section, i+1, num_pages)
+            articles = api.search(sort='newest', fq={'source': ['The New York Times'], 'document_type': ['article'], 'section_name': [section]}, page=i)
             news = parse_articles(articles)
-            
+
             body_text = []
             for j in range(10):
-                r  = requests.get(news[j]['url'])
+                r = requests.get(news[j]['url'])
                 data = r.text
                 soup = BeautifulSoup(data)
-                g_text = soup.find_all("p", {"class":["story-body-text story-content","story-body-text"]})
-                g_text.extend(soup.find_all(["p", {"itemprop":"articleBody"}]))
+                g_text = soup.find_all("p", {"class": ["story-body-text story-content", "story-body-text"]})
+                g_text.extend(soup.find_all(["p", {"itemprop": "articleBody"}]))
                 body_tmp = []
                 for item in g_text:
                     body_tmp.append(item.text)
 
+                # write out csv (url, headline, body)
                 save_filepath = save_dirpath + section + '_' + str(i*10+j).zfill(4) + '.csv'
                 f = open(save_filepath, 'w')
                 try:
                     writer = csv.writer(f)
-                    writer.writerow( ('url', 'title', 'body') )
-                    writer.writerow( (news[j]['url'], news[j]['headline'], body_tmp) )
+                    writer.writerow(('url', 'title', 'body'))
+                    writer.writerow((news[j]['url'], news[j]['headline'], body_tmp))
                 finally:
                     f.close()
+
+                # write article out as .txt document (headline + body)
                 save_filepath = save_dirpath + section + '_' + str(i*10+j).zfill(4) + '.txt'
-                text = [news[j]['headline']] + body_tmp[:-2] # Leave off an advertising string for another article
-                f=open(save_filepath,'w') 
+                text = [news[j]['headline']] + body_tmp[:-2]
+                f = open(save_filepath, 'w')
                 try:
                     for item in text:
-#                         f.write(item+'\n')
                         f.write(item)
                 finally:
                     f.close()
-
-
-

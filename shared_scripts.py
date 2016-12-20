@@ -5,10 +5,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import cross_validation
 from data_science_scripts import results_evaluation
 
+
 def load_data():
-    categories = ['Arts','Business','Obituaries','World','Sports']
+    categories = ['Arts', 'Business', 'Obituaries', 'World', 'Sports']
     nyt = load_files("/Users/camcairns/Dropbox/Datasets/nyt_corpus/txt_document/", shuffle=True)
     return nyt
+
 
 def train_data(nyt, clf):
     # Tokenize
@@ -18,6 +20,7 @@ def train_data(nyt, clf):
     X = np.array(nyt.data)
     y = np.array(nyt.target)
     return X, y, doc_term_matrix, feature_names
+
 
 def get_predictions(kfold, clf, doc_term_matrix, y):
     y_pred = []
@@ -31,5 +34,3 @@ def get_predictions(kfold, clf, doc_term_matrix, y):
         y_test.append(y[test])
     return y_pred, y_test, clf_score
 
-    most_discriminating_words(10, feature_names)
-    results_evaluation.calculate_cv_confusion_matrix(y_test,y_pred,nyt.target_names,kfold.n_folds)
