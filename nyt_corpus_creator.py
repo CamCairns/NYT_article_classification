@@ -55,8 +55,17 @@ def mkdir_p(path):
         else:
             raise
 
+
+def load_api_key(key_path):
+    ''' Reads api key from a one line text file (shields api key from git histroy) '''
+    with open(key_path) as f:
+        api_key = f.readline()
+    return api_key
+
+
 if __name__ == "__main__":
-    api = articleAPI('599c5ebb1e180f4cd6eb426217a06518:6:72209945')
+    api_key = load_api_key("./nyt_api_key.txt")
+    api = articleAPI(api_key)
     nytd_section = ['Arts', 'Business', 'Obituaries', 'Sports', 'World']
 
     for section in nytd_section:

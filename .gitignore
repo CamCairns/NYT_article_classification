@@ -2,3 +2,4 @@
 *.pyc
 NYT_classification.ipynb
 *.ipynb
+/nyt_api_key.txt
