@@ -35,7 +35,7 @@ if __name__ == "__main__":
     nyt = ss.load_data()
     X, y, doc_term_matrix, feature_names = train_data(nyt)
 
-    kfold = cross_validation.KFold(n=len(nyt.data),n_folds=3)
+    kfold = cross_validation.KFold(n=len(nyt.data), n_folds=3)
     y_pred, y_test = get_predictions(kfold)
 
     most_discriminating_words(10, feature_names)

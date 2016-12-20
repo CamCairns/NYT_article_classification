@@ -56,13 +56,6 @@ def mkdir_p(path):
             raise
 
 
-def load_api_key(key_path):
-    ''' Reads api key from a one line text file (shields api key from git histroy) '''
-    with open(key_path) as f:
-        api_key = f.readline()
-    return api_key
-
-
 def create_save_dir(file_type, section):
     root_dirpath = os.environ["data_dir"] + "nyt_corpus/"
     save_dirpath = "/".join(root_dirpath, file_type, section)
@@ -71,8 +64,7 @@ def create_save_dir(file_type, section):
 
 
 if __name__ == "__main__":
-    api_key = load_api_key("./nyt_api_key.txt")
-    api = articleAPI(api_key)
+    api = articleAPI(os.environ["nyt_api_key"])  # load export nyt api key as environmental variable alias=nyt_api_key
 
     nytd_section = ['Arts', 'Business', 'Obituaries', 'Sports', 'World']
     for section in nytd_section:

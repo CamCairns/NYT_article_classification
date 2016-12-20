@@ -29,8 +29,8 @@ def get_predictions(kfold, clf, doc_term_matrix, y):
     clf_score=[]
     for train, test in kfold:
         clf.fit(doc_term_matrix[train,:], y[train])
-        clf_score.append(clf.score(doc_term_matrix[test,:], y[test]))
-        y_pred.append(clf.fit(doc_term_matrix[train,:], y[train]).predict(doc_term_matrix[test,:]))
+        clf_score.append(clf.score(doc_term_matrix[test, :], y[test]))
+        y_pred.append(clf.fit(doc_term_matrix[train, :], y[train]).predict(doc_term_matrix[test,:]))
         y_test.append(y[test])
     return y_pred, y_test, clf_score
 
