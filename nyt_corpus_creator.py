@@ -63,15 +63,20 @@ def load_api_key(key_path):
     return api_key
 
 
+def create_save_dir(file_type, section):
+    root_dirpath = os.environ["data_dir"] + "nyt_corpus/"
+    save_dirpath = "/".join(root_dirpath, file_type, section)
+    mkdir_p(save_dirpath)
+    return save_dirpath
+
+
 if __name__ == "__main__":
     api_key = load_api_key("./nyt_api_key.txt")
     api = articleAPI(api_key)
-    nytd_section = ['Arts', 'Business', 'Obituaries', 'Sports', 'World']
 
+    nytd_section = ['Arts', 'Business', 'Obituaries', 'Sports', 'World']
     for section in nytd_section:
-        save_dirpath = "/Users/camcairns/Dropbox/Datasets/nyt_sections/" + section + "/"
-        mkdir_p(save_dirpath)
-        num_pages = 101  # max = 101
+        num_pages = 101  # nyt max paginate limit = 101
         for i in range(0, num_pages):
             print "scraping %s section, page {0}/{1}".format(section, i+1, num_pages)
             articles = api.search(sort='newest', fq={'source': ['The New York Times'], 'document_type': ['article'], 'section_name': [section]}, page=i)
@@ -89,7 +94,8 @@ if __name__ == "__main__":
                     body_tmp.append(item.text)
 
                 # write out csv (url, headline, body)
-                save_filepath = save_dirpath + section + '_' + str(i*10+j).zfill(4) + '.csv'
+                save_dirpath = create_save_dir("csv_documents", section)
+                save_filepath = save_dirpath + "/{0}_{1}.csv".format(section, str(i*10+j).zfill(4))
                 f = open(save_filepath, 'w')
                 try:
                     writer = csv.writer(f)
@@ -99,7 +105,8 @@ if __name__ == "__main__":
                     f.close()
 
                 # write article out as .txt document (headline + body)
-                save_filepath = save_dirpath + section + '_' + str(i*10+j).zfill(4) + '.txt'
+                save_dirpath = create_save_dir("txt_documents", section)
+                save_filepath = save_dirpath + "/{0}_{1}.txt".format(section, str(i*10+j).zfill(4))
                 text = [news[j]['headline']] + body_tmp[:-2]
                 f = open(save_filepath, 'w')
                 try:
