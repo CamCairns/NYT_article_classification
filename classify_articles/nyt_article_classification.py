@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import json
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_files
 import sklearn.naive_bayes
@@ -29,6 +30,19 @@ def calc_discrimination_metric(target_class, dataset, classifier):
 
 
 def most_discriminating_words(N, feature_names):
+    with open("./results/most_discriminating_words.json", "w") as outfile:
+        results = {}
+        for i, category in enumerate(nyt.target_names):
+            discrimination_metric, discrimination_metric_signed = calc_discrimination_metric(i, nyt, clfNB)
+            idx = np.argsort(discrimination_metric)
+            words = feature_names[idx][::-1][:N]
+            probs = discrimination_metric_signed[idx][::-1][:N]
+            results[category] = zip(words, probs)
+            print "The most discrminating %d words for class %s are:" % (N, category)
+            print words
+            print "They have probabilities:"
+            print probs
+        json.dump(results, outfile, indent=4)
 
 
 def calculate_cv_confusion_matrix(y_true, y_pred, target_names, n_folds):
