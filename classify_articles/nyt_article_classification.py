@@ -7,7 +7,6 @@ import sklearn.naive_bayes
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import cross_validation
 from sklearn.metrics import confusion_matrix
-# from data_science_scripts import results_evaluation
 
 
 def highest_coefficents(N, feature_names):
@@ -75,17 +74,18 @@ def plot_confusion_matrix(cm, target_names, title='Confusion matrix', cmap=plt.c
     plt.savefig('./results/' + title.lower().replace(" ", "_") + ".png", transparant=True)
     plt.close()
 
+
 def get_predictions(kfold, clf, doc_term_matrix, y):
     y_pred = []
     y_test = []
-    y_proba = []
     clf_score = []
     for train, test in kfold:
-        clf.fit(doc_term_matrix[train,:], y[train])
+        clf.fit(doc_term_matrix[train, :], y[train])
         clf_score.append(clf.score(doc_term_matrix[test, :], y[test]))
-        y_pred.append(clf.fit(doc_term_matrix[train, :], y[train]).predict(doc_term_matrix[test,:]))
+        y_pred.append(clf.fit(doc_term_matrix[train, :], y[train]).predict(doc_term_matrix[test, :]))
         y_test.append(y[test])
     return y_pred, y_test, clf_score
+
 
 if __name__ == "__main__":
     nyt = load_files(os.environ["data_dir"] + "/nyt_corpus/txt_document/", shuffle=True)
